@@ -5,32 +5,69 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy_crawler.items import AutorItem, PublicacionItem
 from scrapy.linkextractors import LinkExtractor
 
+
 class crawler(scrapy.Spider):
 	name = "crawler"
 	
 
-	start_urls = [#"http://www.sac.org.ar/argentine-cardiology-journal-archive",
-					#"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
-					#"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
-					#"http://www.intechopen.com/books/latest/1/list",
-					#"http://eprints.internano.org",
-					"http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl"]
-					#"http://eprints.bbk.ac.uk/view/subjects/csis.html",
-					#"http://canterbury33.eprints-hosting.org/view/subjects/QA75.html",
-					#"http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html"]
-					#"http://bdh.bne.es/bnesearch/Search.do"]
-					#"http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber=98723&query_desc="]
+	start_urls = ["http://www.sac.org.ar/argentine-cardiology-journal/",
+					"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
+					"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
+					"http://www.intechopen.com/books/latest/1/list",
+					"http://eprints.internano.org",
+					"http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl",
+					"http://eprints.bbk.ac.uk/view/subjects/csis.html",
+					"http://create.canterbury.ac.uk/view/subjects/QA75.html",
+					"http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html",
+					"http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber=98723"]
 
 	
 
 	def parse(self, response):
+
+		url0 = "http://www.sac.org.ar/argentine-cardiology-journal/"
+		yield scrapy.Request(url0, callback=self.parse_web0)
+
+		i=0
+		urlP="http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset="
+		while(i<=40):
+			urlP += `i`
+			yield scrapy.Request(urlP,callback=self.parse_web1)
+			i +=20
+			urlP = "http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset="
+			
 		url3 = "http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR"
 		yield scrapy.Request(url3,callback=self.parse_web2)
+				
+		j=1
+		urlB1 = "http://www.intechopen.com/books/latest/"
+		urlB2 = "/list"
+		while(j<=322):
+			urlB1 += `j`
+			urlB1 += urlB2
+			yield scrapy.Request(urlB1,callback=self.parse_web3) #llamo al parse de intechopen
+			j+=1
+			urlB1 = "http://www.intechopen.com/books/latest/"
 
-		
+		url5 = "http://eprints.internano.org"
+		yield scrapy.Request(url5,callback=self.parse_web4)
+		url6 = "http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl"
+		yield scrapy.Request(url6,callback=self.parse_web5)
+		url7 = "http://eprints.bbk.ac.uk/view/subjects/csis.html"
+		yield scrapy.Request(url7,callback=self.parse_web6)
+		url8 = "http://create.canterbury.ac.uk/view/subjects/QA75.html"
+		yield scrapy.Request(url8,callback=self.parse_web7)
+		url9 = "http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html"
+		yield scrapy.Request(url9,callback=self.parse_web8)
 
+		f=98723
+		urlF="http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber="
+		while(f<=100037):
+			urlF += `f`
+			yield scrapy.Request(urlF,callback=self.parse_web9)
+			f +=1
+			urlF = "http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber="
 
-	
 
 	def parse_web0(self, response): #http://www.sac.org.ar/argentine-cardiology-journal/
 	# Observaciones: Funciona, pero el ISBN se repite porque es el unico que hay en la pagina. Por lo tanto, es el unico que concuerda con el Regex.
@@ -144,7 +181,9 @@ class crawler(scrapy.Spider):
 					o+=1
 				i+=1
 	
-	def parse_web5(self, response): #Cisti
+	def parse_web5(self, response): #http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl
+	# Observaciones: Aporta muy pocas publicaciones, y la forma en la que estan distribuidos los datos no es uniforme, asi que es dificil obtenerlos.
+	# Consideraria Sacarlo
 		i=0
 		for sel in response.xpath("//div[@class='page']/div[@class='core']/div[@class='colLayout']/div[@class='center']/div[@id='content-container-3col']"):
 			publicaciones = sel.xpath("//div[@class='page']/div[@class='core']/div[@class='colLayout']/div[@class='center']/div[@id='content-container-3col']/div[@class='paddRecent']/div[@class='table-row widthFull']/span[@class='boldFont']/a/text()").extract() #publicacion
@@ -183,6 +222,9 @@ class crawler(scrapy.Spider):
 
 			# Obtengo el numero luego de ISBN o ISSN. Si no hay nada, devuelve NULL
 			isxn = publication.xpath('./a/following-sibling::text()').re_first(r'(ISBN\s+\d+|ISSN\s+\d+-\d+)')
+
+			if isxn == None:
+				isxn = "Null"
 			
 			publicacion = PublicacionItem()
 			publicacion['titulo_publicacion'] = pubtitle
@@ -193,65 +235,84 @@ class crawler(scrapy.Spider):
 			yield publicacion
 			
 	
-	def parse_web7(self, response): #christ church
-		i=0	
-		for sel in response.xpath("//div[@id='ExtContainer']/div[@id='ExtWrapper']/div[@id='ExtBody']/div[@id='ExtMainContent']"):
-			publicaciones = sel.xpath("//div[@id='ExtContainer']/div[@id='ExtWrapper']/div[@id='ExtBody']/div[@id='ExtMainContent']/div[@class='ep_view_page ep_view_page_view_subjects']/p/a/em/text()").extract() #publicacion
-			autores = response.xpath("//div[@id='ExtContainer']/div[@id='ExtWrapper']/div[@id='ExtBody']/div[@id='ExtMainContent']/div[@class='ep_view_page ep_view_page_view_subjects']/p/span[@class='person_name']/text()").extract() #Autor
-			links = sel.xpath("//div[@id='ExtContainer']/div[@id='ExtWrapper']/div[@id='ExtBody']/div[@id='ExtMainContent']/div[@class='ep_view_page ep_view_page_view_subjects']/p/a/@href").extract()
-			if i == 0:
-				o=0
-				while o != len(publicaciones):
-					publicacion = PublicacionItem()
-					publicacion['titulo_publicacion'] = publicaciones[o]
-					publicacion['anio_publicacion'] = response.xpath("//div[@id='ExtContainer']/div[@id='ExtWrapper']/div[@id='ExtBody']/div[@id='ExtMainContent']/div[@class='ep_view_page ep_view_page_view_subjects']/p").re(r'\d\d\d\d')[0].strip() #Fecha, ultimos cuatro digitos.
-					publicacion['isbn'] = response.xpath("//div[@id='ExtContainer']/div[@id='ExtWrapper']/div[@id='ExtBody']/div[@id='ExtMainContent']/div[@class='ep_view_page ep_view_page_view_subjects']/p").re(r'\d\d\d\d-\d\d\d\d')[0].strip()
-					publicacion['nombre_autor'] = autores[o]
-					publicacion['url_link'] = links[o]
-					yield publicacion
-					o+=1
-				i+=1	
+	def parse_web7(self, response): #http://canterbury33.eprints-hosting.org/view/subjects/QA75.html
+	# Observaciones: El indice del ISBN se corre dos o tres lugares, al tener publicaciones sin ISBN.
+		# Cada publicacion esta en un <p>. Hago el for sobre ellos.
+		for publication in response.css('div#ExtContainer > div#ExtWrapper > div#ExtBody > div#ExtMainContent > div.ep_view_page.ep_view_page_view_subjects > p'):
+
+			# Cada publicacion tiene un <a> donde se encuentra el titulo y el Link.
+			for title in publication.xpath('./a'):
+				pubtitle = title.xpath('normalize-space(.)').extract_first()
+				publink = title.xpath('@href').extract_first()
+				break
+			# Aplico Regex para sacar el Año entre los parentesis
+			pubyear = publication.xpath('./text()').re_first(r'\((\d+)\)')
+
+			# Obtengo los autores. Me devuelve un array, pero no lo puedo guardar asi en la base, y como no encontre solucion, decidi guardar uno solo.
+			author = publication.xpath('./span[@class="person_name"][./following-sibling::a]/text()').extract()
+
+			# Obtengo el numero luego de ISBN o ISSN. Si no hay nada, devuelve NULL
+			isxn = publication.xpath('./a/following-sibling::text()').re_first(r'(ISBN\s+\d+|ISSN\s+\d+-\d+)')
+
+			if isxn == None:
+				isxn = "Null"
+			
+			publicacion = PublicacionItem()
+			publicacion['titulo_publicacion'] = pubtitle
+			publicacion['anio_publicacion'] = pubyear 
+			publicacion['isbn'] = isxn
+			publicacion['nombre_autor'] = author[0]
+			publicacion['url_link'] = publink
+			yield publicacion	
 			
 	def parse_web8(self, response): #Repository UK
-		i=0
-		for sel in response.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']"):
-			publicaciones = sel.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']/p/a/em/text()").extract() #publicacion
-			autores = response.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']/p/span[@class='person_name']/text()").extract() #Autor
-			links = sel.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']/p/a/@href").extract()
-			if i == 0:
-				o=0
-				while o != len(publicaciones):
-					publicacion = PublicacionItem()
-					publicacion['titulo_publicacion'] = publicaciones[o]
-					publicacion['anio_publicacion'] = response.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']/p").re(r'\d\d\d\d')[0].strip() #Fecha, ultimos cuatro digitos.
-					publicacion['isbn'] = response.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']/p").re(r'\d\d\d\d-\d\d\d\d')[0].strip()
-					publicacion['nombre_autor'] = autores[o]
-					publicacion['url_link'] = links[o]
-					yield publicacion
-					o+=1
-				i+=1
+		# Cada publicacion esta en un <p>. Hago el for sobre ellos.
+		for publication in response.css('div > div.ep_tm_page_content > div.ep_view_page.ep_view_page_view_subjects > p'):
+
+			# Cada publicacion tiene un <a> donde se encuentra el titulo y el Link.
+			for title in publication.xpath('./a'):
+				pubtitle = title.xpath('normalize-space(.)').extract_first()
+				publink = title.xpath('@href').extract_first()
+				break
+			# Aplico Regex para sacar el Año entre los parentesis
+			pubyear = publication.xpath('./text()').re_first(r'\((\d+)\)')
+
+			# Obtengo los autores. Me devuelve un array, pero no lo puedo guardar asi en la base, y como no encontre solucion, decidi guardar uno solo.
+			author = publication.xpath('./span[@class="person_name"][./following-sibling::a]/text()').extract()
+
+			# Obtengo el numero luego de ISBN o ISSN. 
+			
+
+			isxn = publication.xpath('./a/following-sibling::text()').re_first(r'(ISBN\s+\d+|ISSN\s+\d+-\d+)')
+			#IF para verificar si existe o no el ISBN. Sin este if, en la base se guarda un NULL (no un string que diga "null") por lo que solr no lo importa.
+			if isxn == None:
+				isxn = "Null"
+			
+			publicacion = PublicacionItem()
+			publicacion['titulo_publicacion'] = pubtitle
+			publicacion['anio_publicacion'] = pubyear 
+			publicacion['isbn'] = isxn
+			publicacion['nombre_autor'] = author[0]
+			publicacion['url_link'] = publink
+			yield publicacion
 	
-'''	def parse_web9(self, response): #search.Do
-		i=0
-		for sel in response.xpath("//div/div[@class='ep_tm_page_content']/div[@class='ep_view_page ep_view_page_view_subjects']"):
-			publicaciones = sel.xpath("//div[@id='wrapper']/div[@id='content']/div[@id='div1']/div[@id='results']/div[@id='lista']/div[@class='entrada']/div[@class='details']/h2/a[@class='LabelBlueBold']/text()").extract() #publicacion
-			autores = response.xpath("//div[@id='wrapper']/div[@id='content']/div[@id='div1']/div[@id='results']/div[@id='lista']/div[@class='entrada']/div[@class='details']/span[@class='dato'][1]/b/text()").extract() #Autor
-			links = sel.xpath("//div[@id='wrapper']/div[@id='content']/div[@id='div1']/div[@id='results']/div[@id='lista']/div[@class='entrada']/div[@class='details']/h2/a[@class='LabelBlueBold']/@href").extract()
-			if i == 0:
-				o=0
-				while o != len(publicaciones):
-					publicacion = PublicacionItem()
-					publicacion['titulo_publicacion'] = publicaciones[o]
-					publicacion['anio_publicacion'] = response.xpath("//div[@id='wrapper']/div[@id='content']/div[@id='div1']/div[@id='results']/div[@id='lista']/div[@class='entrada']/div[@class='details']/span[@class='dato'][3]/b/text()").re(r'\d\d\d\d')[0].strip() #Fecha, ultimos cuatro digitos.
-					publicacion['isbn'] = "NULL"
-					gsub('\t|\n', '', autores[o])
-					print(autores[o])
-					raw_input()
-					publicacion['nombre_autor'] = autores[o]
-					publicacion['url_link'] = "http://bdh.bne.es"+links[o]
-					yield publicacion
-					o+=1
-				i+=1'''#tarda demasiado tiempo.
+	def parse_web9(self, response): #Conicet!!
+		
+		for publication in response.css('div#wrap > div.main > div.container-fluid > div.row-fluid > div.span9 > div#catalogue_detail_biblio > div.record'):
+
+			author = publication.xpath('./span[@class="results_summary publisher"]/span/span/a/text()').extract_first()
+			title = publication.css("h1[property=name]::text").extract_first()
+			issn = publication.css("span[property=issn]::text").extract_first()
+
+			publicacion = PublicacionItem()
+			publicacion['titulo_publicacion'] = title
+			publicacion['anio_publicacion'] = "Null"
+			publicacion['isbn'] = issn
+			publicacion['nombre_autor'] = author
+			publicacion['url_link'] = response.url
+			yield publicacion
+			
+			
 
 
 				

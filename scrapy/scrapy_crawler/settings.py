@@ -29,7 +29,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'Webbot.settings'
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY=3
+DOWNLOAD_DELAY=0.25
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN=16
 #CONCURRENT_REQUESTS_PER_IP=16
@@ -67,7 +67,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'Webbot.settings'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'scrapy_crawler.MysqlDAO.ScrapAutores': 1000,
+	'scrapy_crawler.MysqlDAO.ScrapAutores': 1000,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

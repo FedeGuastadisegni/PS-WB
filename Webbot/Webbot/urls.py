@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^get/id=(?P<id_solicitud>\w{0,90})/$', get_id, name='GET_byID'),
     url(r'^get/list/', get_list, name='GET_all'),
      url(r'^get/autor=(?P<nombre>.+?)/$', get_autor, name='GET_byautor'),
+     url(r'^get/titulo=(?P<titulo>.+?)/$',get_titulo,name='GET_bytitulo')
 ]

@@ -14,7 +14,7 @@ def get_id(request,id_solicitud):
     return JsonResponse(rsp['response'])
 
 def get_list(request):
-    conn = urlopen('http://localhost:8983/solr/Index/select?q=*:*&wt=json')
+    conn = urlopen('http://localhost:8983/solr/Index/select?q=*:*&wt=json&rows=10000')
     rsp = eval( conn.read() )
     return JsonResponse(rsp['response'])
 
@@ -22,6 +22,15 @@ def get_autor(request,nombre):
     print nombre
     
     url = 'http://localhost:8983/solr/Index/select?q=Autor:"'+urllib.quote(nombre)+'"&wt=json'
+    conn = urlopen(url)
+    rsp = eval( conn.read() )
+
+    return JsonResponse(rsp['response'])
+
+def get_titulo(request,titulo):
+    print titulo
+    
+    url = 'http://localhost:8983/solr/Index/select?q=Titulo:"'+urllib.quote(titulo)+'"&wt=json'
     conn = urlopen(url)
     rsp = eval( conn.read() )
 
