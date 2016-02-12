@@ -10,17 +10,17 @@ class crawler(scrapy.Spider):
 	name = "crawler"
 	
 
-	start_urls = [#"http://www.sac.org.ar/argentine-cardiology-journal/",
-					#"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
-					#"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
-					#"http://www.intechopen.com/books/latest/1/list",
-					#"http://eprints.internano.org",
-					#"http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl",
-					#"http://eprints.bbk.ac.uk/view/subjects/csis.html",
-					#"http://create.canterbury.ac.uk/view/subjects/QA75.html",
-					#"http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html",
-					#"http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber=98723",
-					#"https://ueaeprints.uea.ac.uk/cgi/search/simple?exp=0|1|date/creators_name/title|archive|-|q:_fulltext_/abstract/creators_search_name/date/title:ALL:IN:fulltext|-|eprint_status:eprint_status:ALL:EQ:archive|metadata_visibility:metadata_visibility:ALL:EX:show&_action_search=1&order=date/creators_name/title&screen=Public::EPrintSearch&cache=2594200&search_offset=0"]
+	start_urls = ["http://www.sac.org.ar/argentine-cardiology-journal/",
+					"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
+					"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
+					"http://www.intechopen.com/books/latest/1/list",
+					"http://eprints.internano.org",
+					"http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl",
+					"http://eprints.bbk.ac.uk/view/subjects/csis.html",
+					"http://create.canterbury.ac.uk/view/subjects/QA75.html",
+					"http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html",
+					"http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber=98723",
+					"https://ueaeprints.uea.ac.uk/cgi/search/simple?exp=0|1|date/creators_name/title|archive|-|q:_fulltext_/abstract/creators_search_name/date/title:ALL:IN:fulltext|-|eprint_status:eprint_status:ALL:EQ:archive|metadata_visibility:metadata_visibility:ALL:EX:show&_action_search=1&order=date/creators_name/title&screen=Public::EPrintSearch&cache=2594200&search_offset=0",
 					"http://search.scielo.org/?q=science&lang=pt&count=50&from=0&output=site&sort=&format=summary&fb=&page=1"]
 
 	
