@@ -74,14 +74,18 @@ class crawler(scrapy.Spider):
 		url10 = "https://ueaeprints.uea.ac.uk/cgi/search/simple?exp=0|1|date/creators_name/title|archive|-|q:_fulltext_/abstract/creators_search_name/date/title:ALL:IN:fulltext|-|eprint_status:eprint_status:ALL:EQ:archive|metadata_visibility:metadata_visibility:ALL:EX:show&_action_search=1&order=date/creators_name/title&screen=Public::EPrintSearch&cache=2594200&search_offset=0"
 		yield scrapy.Request(url10,callback=self.parse_web10)
 
-		#Este todavia no anda!!!!!!!!!!!!!!!!
 		q=1
-		urlq1 = "http://search.scielo.org/?q=science&lang=pt&count=50&from=0&output=site&sort=&format=summary&fb=&page="
-		while(q<=1103):
-			urlq1 += `q`
-			yield scrapy.Request(urlq1,callback=self.parse_web11) 
+		a = 1
+		urlQ = 'http://search.scielo.org/?q=science&lang=pt&count=50&from=1&output=site&sort=&format=summary&fb=&page='
+		while(q<=60):
+
+			urlQ += `q`
+			yield scrapy.Request(urlQ,callback=self.parse_web11)
 			q+=1
-			urlq1 = "http://search.scielo.org/?q=science&lang=pt&count=50&from=0&output=site&sort=&format=summary&fb=&page="
+			a = a+50
+			urlQ = 'http://search.scielo.org/?q=science&lang=pt&count=50&from='
+			urlQ += str(a)
+			urlQ += '&output=site&sort=&format=summary&fb=&page='
 		
 		
 
