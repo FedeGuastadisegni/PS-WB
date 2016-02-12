@@ -10,7 +10,7 @@
 
 <style>
 .jumbotron { 
-    background-color: #f4511e; /* Orange */
+    background-color: #91162e; /* Orange */
     color: #ffffff;
 }
 
@@ -23,27 +23,63 @@
 	margin-left:300;
 	margin-right:300;
 }
+
+.input-group {
+    text-align:center;
+}
+
+.img-responsive {
+    margin: 0 auto;
+}
+
+.footfont{
+    color: #646464;
+}
+.footfont:hover{
+    color: #646464;
+}
+
+.footimg{
+    padding-left: 10px;
+    width: 5%;
+}
+
+
 </style>
 
 
 	<body>
-	<div class="jumbotron text-center">
-  	<h1><em>Webbot de datos Bibliométricos</em></h1> 
-	 <div class="input-group" buscar>
-    <input type="text" class="form-control" id="query" value="Ingrese la búsqueda..." onfocus="clearField(this);">
-    <span class="input-group-btn">
-    <button id="search" type="button" class="btn btn-primary">Buscar!</button>
-    </span>
-    </div>
-
-	</div>
+	   <div class="jumbotron text-center">
+  	     <h1><em>Web Bot de Datos Bibliométricos</em></h1>
+          <img src="img/unla.png" class="img-responsive" alt="Unla" width="150" height="150"> 
+          <br/>
+         <div class="col-md-4 col-md-offset-4" > 
+	       <div class="input-group" buscar>
+            <input type="text" class="form-control" id="query" value="Ingrese la búsqueda..." onfocus="clearField(this);" >
+                <span class="input-group-btn">
+                    <button id="search" type="button" class="btn btn-primary">Buscar!</button>
+                </span>
+            </div>
+         </div>
+	   </div>
 
     <div class="container text-center" id="results">
-
+        <h2>Realice una busqueda!</h2>
     </div>
 
-
-
+<footer class="color3">
+    <div class="footer">
+        <div class="col-sm-3 color3">
+            
+        </div>
+        <div class="col-sm-6 color3" align="center">
+             Proyecto de Software. De Domingo Gonzalo, Guastadisegni Federico, Rodriguez Nahuel.
+        </div>
+        <div class="col-sm-4 color3" align="center">
+           
+        </div>
+    </div>
+</footer>
 </body>
 
 

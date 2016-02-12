@@ -10,16 +10,18 @@ class crawler(scrapy.Spider):
 	name = "crawler"
 	
 
-	start_urls = ["http://www.sac.org.ar/argentine-cardiology-journal/",
-					"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
-					"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
-					"http://www.intechopen.com/books/latest/1/list",
-					"http://eprints.internano.org",
-					"http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl",
-					"http://eprints.bbk.ac.uk/view/subjects/csis.html",
-					"http://create.canterbury.ac.uk/view/subjects/QA75.html",
-					"http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html",
-					"http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber=98723"]
+	start_urls = [#"http://www.sac.org.ar/argentine-cardiology-journal/",
+					#"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
+					#"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
+					#"http://www.intechopen.com/books/latest/1/list",
+					#"http://eprints.internano.org",
+					#"http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl",
+					#"http://eprints.bbk.ac.uk/view/subjects/csis.html",
+					#"http://create.canterbury.ac.uk/view/subjects/QA75.html",
+					#"http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html",
+					#"http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber=98723",
+					#"https://ueaeprints.uea.ac.uk/cgi/search/simple?exp=0|1|date/creators_name/title|archive|-|q:_fulltext_/abstract/creators_search_name/date/title:ALL:IN:fulltext|-|eprint_status:eprint_status:ALL:EQ:archive|metadata_visibility:metadata_visibility:ALL:EX:show&_action_search=1&order=date/creators_name/title&screen=Public::EPrintSearch&cache=2594200&search_offset=0"]
+					"http://search.scielo.org/?q=science&lang=pt&count=50&from=0&output=site&sort=&format=summary&fb=&page=1"]
 
 	
 
@@ -59,6 +61,7 @@ class crawler(scrapy.Spider):
 		yield scrapy.Request(url8,callback=self.parse_web7)
 		url9 = "http://www.repository.heartofengland.nhs.uk/view/subjects/WK.html"
 		yield scrapy.Request(url9,callback=self.parse_web8)
+		
 
 		f=98723
 		urlF="http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber="
@@ -67,6 +70,22 @@ class crawler(scrapy.Spider):
 			yield scrapy.Request(urlF,callback=self.parse_web9)
 			f +=1
 			urlF = "http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber="
+		
+		url10 = "https://ueaeprints.uea.ac.uk/cgi/search/simple?exp=0|1|date/creators_name/title|archive|-|q:_fulltext_/abstract/creators_search_name/date/title:ALL:IN:fulltext|-|eprint_status:eprint_status:ALL:EQ:archive|metadata_visibility:metadata_visibility:ALL:EX:show&_action_search=1&order=date/creators_name/title&screen=Public::EPrintSearch&cache=2594200&search_offset=0"
+		yield scrapy.Request(url10,callback=self.parse_web10)
+
+		#Este todavia no anda!!!!!!!!!!!!!!!!
+		q=1
+		urlq1 = "http://search.scielo.org/?q=science&lang=pt&count=50&from=0&output=site&sort=&format=summary&fb=&page="
+		while(q<=1103):
+			urlq1 += `q`
+			yield scrapy.Request(urlq1,callback=self.parse_web11) 
+			q+=1
+			urlq1 = "http://search.scielo.org/?q=science&lang=pt&count=50&from=0&output=site&sort=&format=summary&fb=&page="
+		
+		
+
+		
 
 
 	def parse_web0(self, response): #http://www.sac.org.ar/argentine-cardiology-journal/
@@ -313,6 +332,48 @@ class crawler(scrapy.Spider):
 			yield publicacion
 			
 			
+	def parse_web10(self, response): #https://ueaeprints.uea.ac.uk/cgi/search/simple?exp=0|1|date/creators_name/title|archive|-|q:_fulltext_/abstract/creators_search_name/date/title:ALL:IN:fulltext|-|eprint_status:eprint_status:ALL:EQ:archive|metadata_visibility:metadata_visibility:ALL:EX:show&_action_search=1&order=date/creators_name/title&screen=Public::EPrintSearch&cache=2594200&search_offset=0
+		
+		for publication in response.css('div#center > div#width > div#bodyWrap > div#centerCol > div#content > div.ep_search_results > table.ep_paginate_list > tr.ep_search_result'):
+
+			author = publication.xpath('./td/span[@class="person_name"]/text()').extract_first()
+			title = publication.xpath('./td/a/em/text()').extract_first()
+			issn = publication.xpath('./td/text()').re_first(r'(ISBN\s+\d+|ISSN\s+\d+-\d+)')
+			link = publication.xpath('./td/a/@href').extract_first()
+			anio = publication.xpath('./td/text()').re_first(r'\((\d+)\)')
+
+			if issn == None:
+				issn = "Null"
+
+			publicacion = PublicacionItem()
+			publicacion['titulo_publicacion'] = title
+			publicacion['anio_publicacion'] = anio
+			publicacion['isbn'] = issn
+			publicacion['nombre_autor'] = author
+			publicacion['url_link'] = link
+			yield publicacion
+			
+	def parse_web11(self, response): #Scielo
+		
+		for publication in response.css('div.results > div.item'):
+
+			author = publication.xpath('./div[@class="col-md-11 col-sm-10 col-xs-11"]/div[@class="line authors"]/a/text()').extract_first()
+			title = publication.xpath('./div[@class="col-md-11 col-sm-10 col-xs-11"]/div[@class="line"]/a/strong[@class="title"]/text()').extract_first()
+			doi = publication.xpath('./div[@class="col-md-11 col-sm-10 col-xs-11"]/div[@class="line metadata"]/div[@class="col-md-12 col-sm-12"]/span/span/strong[@class="DOIResults"]/text()').extract_first()
+			link = publication.xpath('./div[@class="col-md-11 col-sm-10 col-xs-11"]/div[@class="line"]/a/@href').extract_first()
+			anio = publication.xpath('./div[@class="col-md-11 col-sm-10 col-xs-11"]/div[@class="line source"]/span/text()').re_first(r'\d\d\d\d')
 
 
+			if doi == None:
+				doi = "Null"
+			else:
+				doi = doi[4:]
+
+			publicacion = PublicacionItem()
+			publicacion['titulo_publicacion'] = title
+			publicacion['anio_publicacion'] = anio
+			publicacion['isbn'] = doi
+			publicacion['nombre_autor'] = author
+			publicacion['url_link'] = link
+			yield publicacion
 				
