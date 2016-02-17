@@ -37,10 +37,10 @@ def get_titulo(request,titulo):
 
     return JsonResponse(rsp['response'])
 
-def get_url(request,url):
-    print url
+def get_url(request,uu):
+    print uu
     
-    url = 'http://localhost:8983/solr/Index/select?q=URL:"'+urllib.quote(url)+'"&wt=json&rows=10000'
+    url = 'http://localhost:8983/solr/Index/select?q=URL:"'+urllib.quote(uu)+'"&wt=json&rows=10000'
     conn = urlopen(url)
     rsp = eval( conn.read() )
 

@@ -6,10 +6,11 @@ from scrapy_crawler.items import AutorItem, PublicacionItem
 from scrapy.linkextractors import LinkExtractor
 
 
+
 class crawler(scrapy.Spider):
 	name = "crawler"
-	
 
+	
 	start_urls = ["http://www.sac.org.ar/argentine-cardiology-journal/",
 					"http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=",
 					"http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VqaLtl4oDtR",
@@ -44,10 +45,10 @@ class crawler(scrapy.Spider):
 		j=1
 		urlB1 = "http://www.intechopen.com/books/latest/"
 		urlB2 = "/list"
-		while(j<=322):
+		while(j<=188):
 			urlB1 += `j`
 			urlB1 += urlB2
-			yield scrapy.Request(urlB1,callback=self.parse_web3) #llamo al parse de intechopen
+			yield scrapy.Request(urlB1,callback=self.parse_web3) 
 			j+=1
 			urlB1 = "http://www.intechopen.com/books/latest/"
 
@@ -65,7 +66,7 @@ class crawler(scrapy.Spider):
 
 		f=98723
 		urlF="http://binpar.caicyt.gov.ar/cgi-bin/koha/opac-detail.pl?biblionumber="
-		while(f<=100037):
+		while(f<=99500): 
 			urlF += `f`
 			yield scrapy.Request(urlF,callback=self.parse_web9)
 			f +=1
@@ -77,7 +78,7 @@ class crawler(scrapy.Spider):
 		q=1
 		a = 1
 		urlQ = 'http://search.scielo.org/?q=science&lang=pt&count=50&from=1&output=site&sort=&format=summary&fb=&page='
-		while(q<=60):
+		while(q<=10): 
 
 			urlQ += `q`
 			yield scrapy.Request(urlQ,callback=self.parse_web11)
@@ -93,7 +94,6 @@ class crawler(scrapy.Spider):
 
 
 	def parse_web0(self, response): #http://www.sac.org.ar/argentine-cardiology-journal/
-	# Observaciones: Funciona, pero el ISBN se repite porque es el unico que hay en la pagina. Por lo tanto, es el unico que concuerda con el Regex.
 		i=0
 		for sel in response.xpath("//ul[@class='d3s-revista']"):
 			publicaciones = sel.xpath("//li[contains(p, 'Scientific Letters')]/p[@class='d3s-titulo-post']/text()").extract()
@@ -113,8 +113,6 @@ class crawler(scrapy.Spider):
 				i+=1 
 		
 	def parse_web1(self, response): #http://rinfi.fi.mdp.edu.ar/xmlui/recent-submissions?offset=0/20/40
-	# Observaciones: Funciona, y trae de las tres paginas. Problema: Las publicaciones estan en dos tipos distintos de Xpath (hay 20 por pagina, esta sacando 10 por pagina)
-	# Puede parecer que repite el año, pero son todas de 2014. El isbn esta dentro del PDF, decidi poner un Null.
 		i=0
 		for sel in response.xpath("//div[@id='ds-main']/div[@id='ds-content-wrapper']/div[@id='ds-content']/div[@id='ds-body']"):
 			publicaciones = sel.xpath("//div[@id='ds-body']/div[@id='aspect_discovery_recentSubmissions_RecentSubmissionTransformer_div_main-recent-submissions']/div[@id='aspect_discovery_recentSubmissions_RecentSubmissionTransformer_div_recent-submissions']/ul[@class='ds-artifact-list']/li[@class='ds-artifact-item odd' or @class='ds-artifact-item even']/div[@class='artifact-description']/div[@class='artifact-title']/a/text()").extract()
@@ -136,7 +134,6 @@ class crawler(scrapy.Spider):
 		
 
 	def parse_web2(self, response): #http://road.issn.org/issn_search?afs:query=&show-adv=0&afs:replies=100#.VrO8GF4oDtT
-	# Observaciones: Trae todo. Por cuestiones de similitud, en esta pagina, el año va a tener que quedar con formato aaaa/mm/dd
 		i=0
 		for sel in response.xpath("//div[@class='page-container']/div[@class='page']/div[@id='main-content']/div[@class='main-content-inside']/div[@class='region-content']/div[@class='issn-search']/div[@class='search-results']/div[@class='search-result type-journals']"):
 			publicaciones = sel.xpath("//div[@class='page-container']/div[@class='page']/div[@id='main-content']/div[@class='main-content-inside']/div[@class='region-content']/div[@class='issn-search']/div[@class='search-results']/div[@class='search-result type-journals']/div[@class='search-result-title']/a/text()").extract()
@@ -160,7 +157,6 @@ class crawler(scrapy.Spider):
 	
 	
 	def parse_web3(self, response): #http://www.intechopen.com/books/latest/1/list itera sobre todas las paginas.
-	# Observaciones: cambios en el while: cambie la forma en la que el año y el ISBN se obtienen. Ahora, son arrays como los demas elementos. Esto evita que se guarden duplicados
 		i=0
 		for sel in response.xpath("//div[@id='sizer']/div[@id='content']/div[@class='grid']/div[@class='main-content']/div[@id='tc']/div/ul[@class='book-listing entity-listing']/li"):
 			publicaciones = sel.xpath("//div[@id='sizer']/div[@id='content']/div[@class='grid']/div[@class='main-content']/div[@id='tc']/div/ul[@class='book-listing entity-listing']/li/dl/dt/a/text()").extract() #publicacion
@@ -183,7 +179,6 @@ class crawler(scrapy.Spider):
 
 
 	def parse_web4(self, response): #http://eprints.internano.org/
-	# Observaciones: todo funciona bien.
 		i=0
 		for sel in response.xpath("//div[@id='wrapper']/div[@id='shadow']/div[@id='box']/div"):
 			publicaciones = sel.xpath("//div[@id='wrapper']/div[@id='shadow']/div[@id='box']/div/div[@class='ep_tm_page_content']/div[@class='ep_latest_additions']/div[@class='ep_latest_list']/div[@class='ep_latest_result']/a/em/text()").extract() #publicacion
@@ -205,8 +200,6 @@ class crawler(scrapy.Spider):
 				i+=1
 	
 	def parse_web5(self, response): #http://nparc.cisti-icist.nrc-cnrc.gc.ca/npsi/ctrl
-	# Observaciones: Aporta muy pocas publicaciones, y la forma en la que estan distribuidos los datos no es uniforme, asi que es dificil obtenerlos.
-	# Consideraria Sacarlo
 		i=0
 		for sel in response.xpath("//div[@class='page']/div[@class='core']/div[@class='colLayout']/div[@class='center']/div[@id='content-container-3col']"):
 			publicaciones = sel.xpath("//div[@class='page']/div[@class='core']/div[@class='colLayout']/div[@class='center']/div[@id='content-container-3col']/div[@class='paddRecent']/div[@class='table-row widthFull']/span[@class='boldFont']/a/text()").extract() #publicacion
@@ -227,7 +220,6 @@ class crawler(scrapy.Spider):
 
 
 	def parse_web6(self, response): #http://eprints.bbk.ac.uk/view/subjects/csis.html
-	#Observaciones: Funciona bien, pero la publicacion en la base va a tener solo un autor. Cuestiones de diseño.
 		
 		# Cada publicacion esta en un <p>. Hago el for sobre ellos.
 		for publication in response.css('div > div.ep_tm_page_content > div.ep_view_page.ep_view_page_view_subjects > p'):
@@ -259,8 +251,6 @@ class crawler(scrapy.Spider):
 			
 	
 	def parse_web7(self, response): #http://canterbury33.eprints-hosting.org/view/subjects/QA75.html
-	# Observaciones: El indice del ISBN se corre dos o tres lugares, al tener publicaciones sin ISBN.
-		# Cada publicacion esta en un <p>. Hago el for sobre ellos.
 		for publication in response.css('div#ExtContainer > div#ExtWrapper > div#ExtBody > div#ExtMainContent > div.ep_view_page.ep_view_page_view_subjects > p'):
 
 			# Cada publicacion tiene un <a> donde se encuentra el titulo y el Link.
@@ -380,4 +370,7 @@ class crawler(scrapy.Spider):
 			publicacion['nombre_autor'] = author
 			publicacion['url_link'] = link
 			yield publicacion
-				
+	
+	
+	
+	

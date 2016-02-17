@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
+from scrapy.xlib.pydispatch import dispatcher
+from scrapy import signals
 
 
 class ScrapRapiPagoPipeline(object):
@@ -15,3 +17,13 @@ class ScrapRapiPagoPipeline(object):
             return address[0:m.end(1)]
         return address
 
+    def __init__(self, stats, settings):
+    	self.stats = stats
+    	dispatcher.connect(self.save_crawl_stats,signals.spider_closed)
+
+	@classmethod
+	def from_crawler(cls, crawler):
+    	return cls(crawler.stats,crawler.settings)
+
+	def save_crawl_stats(self):
+    	record_crawl_stats(self.cur,self.stats,self.crawl_instance)
